@@ -1,5 +1,7 @@
 // Import the xlsx library
 const XLSX = require("xlsx");
+const fs = require("fs");
+
 
 // Read the Excel file
 const workbook = XLSX.readFile("./data.xlsx");
@@ -19,7 +21,7 @@ const columnA = jsonData.map((row) => row[0]);
 // ...
 
 // Print the data in the columns
-console.log("Column A:", columnA);
+console.log(typeof columnA);
 // console.log("Column B:", columnB);
 
 const puppeteer = require("puppeteer");
@@ -69,7 +71,7 @@ const puppeteer = require("puppeteer");
     console.log("Anchor tag not found: Already on LinkedIn? Sign in");
   }
   // console.log('Delaying for 30 seconds...');
-  // await new Promise((resolve) => setTimeout(resolve, 30000)); // 3000 milliseconds (3 seconds) delay
+  await new Promise((resolve) => setTimeout(resolve, 3000)); // 3000 milliseconds (3 seconds) delay
 
   if (!clicked) {
       await page.waitForSelector('button[data-tracking-control-name="auth_wall_desktop_profile-login-toggle"]',{timeout:5000});
@@ -100,27 +102,32 @@ const puppeteer = require("puppeteer");
   }
 
 
-
-
-
-  console.log('Delaying for 30 seconds...');
-  await new Promise((resolve) => setTimeout(resolve, 10000)); // 3000 milliseconds (3 seconds) delay
-
-  await page.goto(
-    "https://www.linkedin.com/in/ACwAAAo3iesB9T8DIa38EbEK2W906q9gJcaWbq0"
-  );
-
-
-  console.log('page loading...');
-  page.waitForNavigation();
-  
-  console.log('Delaying for 30 seconds...');
+  console.log('Delaying for 5 seconds...');
   await new Promise((resolve) => setTimeout(resolve, 5000)); // 3000 milliseconds (3 seconds) delay
-  const currentURL = await page.url();
-  console.log('Current URL:', currentURL);
-  // const inputPwd = await page.$("#session_password");
-  // await inputPwd.type("arpit123");
+  
+  //change the index here
+  for (let index = 75; index < columnA.length; index++) {
+    await page.goto(
+      columnA[index]
+    );
+    console.log('page loading...');
+    page.waitForNavigation();
+    console.log('Delaying for 10 seconds...');
+    await new Promise((resolve) => setTimeout(resolve, 10000)); // 3000 milliseconds (3 seconds) delay
+    const currentURL = await page.url();
+    console.log('Current URL:', currentURL);
+    if(currentURL){
+      const csvData = `"${currentURL}"\n`;
+      fs.appendFileSync("profile_urls.csv", csvData, "utf8");
+      console.log("data saved to o/p file , this row index : ",index);
+    }else{
+      const err = "not found"
+      const csvData = `"${err}"\n`;
+      fs.appendFileSync("profile_urls.csv", csvData, "utf8");
+    }
+  }
 
   // Close the browser
-  // await browser.close();
+  console.log("data is collected successfully")
+  await browser.close();
 })();
