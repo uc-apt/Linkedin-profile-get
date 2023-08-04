@@ -34,6 +34,9 @@ def automate_chrome(url):
     email_field.send_keys(email_address)
     password_field.send_keys(password)
 
+    print("all details are filled")
+    time.sleep(100000)
+
     button = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.XPATH, "//button[text()='Sign in']")))
 
     button.click()
